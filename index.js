@@ -14,10 +14,19 @@ app.get('/', function(req, res) {
 
 var io = require('socket.io').listen(app.listen(port));
 
+var users = [];
+
 //set up event listeners
 io.sockets.on('connection', function(socket) {
-	socket.emit('message', {message: 'Welcome to the chat!'});
+	socket.emit('message', { name: 'Server', message: 'Welcome to the chat!' });
+  socket.emit('populate_users', { usrs: users });
+
 	socket.on('send', function(data) {
 		io.sockets.emit('message', data);
 	});
+
+  socket.on('add_name', function(data) {
+    users.push(data.name);
+    io.sockets.emit('add_name', { name: data.name });
+  });
 });
